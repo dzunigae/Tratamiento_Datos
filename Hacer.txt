@@ -1,0 +1,26 @@
+Hay que buscar cómo hacer que las carpetas que no existen en el origen se eliminen antes en la copia para no generar problemas de
+no espacio
+
+Errores eliminando permisos Winin 5
+Hay un error de que el original de escritorio y la copia de respaldo tienen tamaños distintos
+Lo de excluir las carpetas de sistema en los volumenes (volume system info y recycle bin)
+
+Los errores de lectura no se están añadiendo a ningún lado
+
+Lo de que la ñ no se escribe bien
+
+En el log de conflictos quisiera poner también al ruta completa de los archivos
+
+Adaptar este código para la copia del celular
+
+Ver cómo añadir rutas a ignorar o sólo enfocarse en un listado específico
+
+Que cuando se copien archivos por inconsistencias en hash, la diferenciación de source o destino se haga en el nombre y no en la extensión.
+
+Es mejor tener la base de datos con el nombre, dirección y hash de los archivos para hacer más óptimo si fue que cambiaron de carpeta.
+
+Necesito un script a parte para el tema de escanear los archivos en busca de posibles errores.
+
+
+A futuro:
+Añadir rutas donde sé que pueden haber partidas importantes de juegos.

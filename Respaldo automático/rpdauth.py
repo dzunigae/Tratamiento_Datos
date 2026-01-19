@@ -1,65 +1,12 @@
+# Importación de herramientas comunes
+import sys
 import os
+sys.path.append(os.path.abspath("."))
+# Resto de importaciones
 import shutil
 import hashlib
-import ctypes
-from ctypes import wintypes
 from datetime import datetime
-from pathlib import Path
-
-def encontrar_assets():
-    documentos = Path.home() / "OneDrive" / "Documentos"  # funciona en Windows moderno
-
-    for ruta in documentos.rglob("Respaldo de archivos"):
-        if ruta.is_dir():
-            return ruta
-
-    raise FileNotFoundError("No se encontró la carpeta 'Respaldo de archivos'")
-
-def enable_privileges():
-    SE_PRIVILEGE_ENABLED = 0x00000002
-    privileges = ['SeBackupPrivilege', 'SeRestorePrivilege']
-
-    hToken = wintypes.HANDLE()
-    TOKEN_ADJUST_PRIVILEGES = 0x0020
-    TOKEN_QUERY = 0x0008
-
-    class LUID(ctypes.Structure):
-        _fields_ = [("LowPart", wintypes.DWORD),
-                    ("HighPart", wintypes.LONG)]
-
-    class LUID_AND_ATTRIBUTES(ctypes.Structure):
-        _fields_ = [("Luid", LUID),
-                    ("Attributes", wintypes.DWORD)]
-
-    class TOKEN_PRIVILEGES(ctypes.Structure):
-        _fields_ = [("PrivilegeCount", wintypes.DWORD),
-                    ("Privileges", LUID_AND_ATTRIBUTES * len(privileges))]
-
-    # Abrir el token del proceso actual
-    ctypes.windll.advapi32.OpenProcessToken(
-        ctypes.windll.kernel32.GetCurrentProcess(),
-        TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,
-        ctypes.byref(hToken)
-    )
-
-    tp = TOKEN_PRIVILEGES()
-    tp.PrivilegeCount = len(privileges)
-
-    for i, name in enumerate(privileges):
-        luid = LUID()
-        ctypes.windll.advapi32.LookupPrivilegeValueW(None, name, ctypes.byref(luid))
-        tp.Privileges[i].Luid = luid
-        tp.Privileges[i].Attributes = SE_PRIVILEGE_ENABLED
-
-    # Ajustar los privilegios del token
-    ctypes.windll.advapi32.AdjustTokenPrivileges(
-        hToken,
-        False,
-        ctypes.byref(tp),
-        0,
-        None,
-        None
-    )
+from herramientas_comunes import encontrar_assets, enable_privileges
 
 def get_file_size(path):
     return os.path.getsize(path) if os.path.exists(path) else -1
@@ -164,7 +111,7 @@ def report_conflict(details, conflict_dir, conflict_log, changes):
         log.write(f"Copias guardadas: {src_copy}, {dst_copy}\n")
         log.write("-" * 40 + "\n")
 
-def sync_directories(source, backup, log_file, conflict_dir=encontrar_assets() / "conflictos", conflict_log=encontrar_assets() / "conflictos" / "log_conflictos.txt"):
+def sync_directories(source, backup, log_file, conflict_dir=encontrar_assets("Respaldo de archivos") / "conflictos", conflict_log=encontrar_assets("Respaldo de archivos") / "conflictos" / "log_conflictos.txt"):
     changes = []
 
     if not os.path.exists(backup):
@@ -202,6 +149,7 @@ def sync_directories(source, backup, log_file, conflict_dir=encontrar_assets() /
                 log.write("\n".join([f"- {c}" for c in changes]))
                 log.write("\n")
         except Exception as e:
+            changes.append(f"Error escribiendo el log: {e}")
             print(f"Error escribiendo el log: {e}")
 
     if changes:
@@ -210,8 +158,8 @@ def sync_directories(source, backup, log_file, conflict_dir=encontrar_assets() /
         print(f"No hubo cambios en {backup}.")
 
 def main():
-    rutas_file = encontrar_assets() / "rutas.txt"
-    log_file = encontrar_assets() / "backup_log.txt"
+    rutas_file = encontrar_assets("Respaldo de archivos") / "rutas.txt"
+    log_file = encontrar_assets("Respaldo de archivos") / "backup_log.txt"
 
     if not os.path.exists(rutas_file):
         print(f"Archivo '{rutas_file}' no encontrado. Crea un archivo con las rutas:")
