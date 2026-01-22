@@ -5,15 +5,12 @@ sys.path.append(os.path.abspath("."))
 # Resto de importaciones
 import subprocess
 import re
-import ctypes
 import pandas as pd
 import sqlite3
 import threading
 import tkinter as tk
-from tkinter import filedialog
 from collections import defaultdict
-from ctypes import wintypes
-from herramientas_comunes import encontrar_assets, enable_privileges
+from herramientas_comunes import encontrar_assets, enable_privileges, seleccionar_directorio
 
 # Configuración de rutas
 BASE_DIR = encontrar_assets("Reporte de metadatos")
@@ -21,21 +18,7 @@ EXIFTOOL_PATH = encontrar_assets("*exiftool*")
 DB_PATH = os.path.join(BASE_DIR, "metadata_analysis.db")
 EXCEL_PATH = os.path.join(BASE_DIR, "informe_exiftool.xlsx")
 MODIFIED_REPORT_PATH = os.path.join(BASE_DIR, "archivos_modificados.xlsx")
-
-# Selección de directorio a analizar
-
-# Oculta la ventana principal de tkinter
-root = tk.Tk()
-root.withdraw()
-
-DIRECTORIO_A_ANALIZAR = filedialog.askdirectory(
-    title="Seleccione el directorio del disco externo"
-)
-
-if not DIRECTORIO_A_ANALIZAR:
-    raise Exception("No se seleccionó ningún directorio")
-
-print("Directorio seleccionado:", DIRECTORIO_A_ANALIZAR)
+DIRECTORIO_A_ANALIZAR = seleccionar_directorio()
 
 # Variable de control para detener la ejecución
 stop_execution = False
@@ -135,7 +118,20 @@ for root, _, files in os.walk(DIRECTORIO_A_ANALIZAR):
             continue  # Saltar archivos ya procesados sin cambios
 
         try:
-            result = subprocess.run([EXIFTOOL_PATH / "exiftool.exe", file_path], capture_output=True, text=True, encoding="utf-8", errors='ignore')
+            result = subprocess.run(
+                [
+                    EXIFTOOL_PATH / "exiftool.exe",
+                    #"-G1",
+                    #"-a",
+                    #"-s",
+                    #"-s",
+                    file_path
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="ignore"
+                )
             output = result.stdout
             
             if output:

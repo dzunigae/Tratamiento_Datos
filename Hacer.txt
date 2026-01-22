@@ -24,3 +24,8 @@ Necesito un script a parte para el tema de escanear los archivos en busca de pos
 
 A futuro:
 Añadir rutas donde sé que pueden haber partidas importantes de juegos.
+
+Todas las funciones relacionadas a excel deben estar en un archivo expecífico en al nivel de herramientas_comunes
+
+El algoritmo para eliminar metadatos incluye un gran porcentaje de intervención manual sobre el archivo excel que dá
+la herramienta de reporte de datos y metadatos, esta manualidad debe removerse.

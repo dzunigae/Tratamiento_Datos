@@ -3,7 +3,10 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox
 from ctypes import wintypes
+import tkinter as tk
+from tkinter import filedialog
 
+# Activar permisos necesarios para ciertas acciones
 def enable_privileges():
     SE_PRIVILEGE_ENABLED = 0x00000002
     privileges = ['SeBackupPrivilege', 'SeRestorePrivilege']
@@ -89,3 +92,20 @@ def encontrar_assets(carpeta: str) -> Path:
         root.destroy()
 
     return coincidencias[0]
+
+# Función para que el usuario seleccione un directorio visualmente
+def seleccionar_directorio() -> str:
+    # Oculta la ventana principal de tkinter
+    root = tk.Tk()
+    root.withdraw()
+
+    DIRECTORIO = filedialog.askdirectory(
+        title="Seleccione el directorio del disco externo"
+    )
+
+    if not DIRECTORIO:
+        raise Exception("No se seleccionó ningún directorio")
+
+    print("Directorio seleccionado:", DIRECTORIO)
+
+    return DIRECTORIO
